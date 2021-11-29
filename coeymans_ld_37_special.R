@@ -1,3 +1,6 @@
+# Code used for creating Coeymans Legislative District 37 Special Map on my blog. Census TIGER lines can be gotten from the 
+# Census website, the EDs can be found here: https://services8.arcgis.com/MVX6tbvWftyS3KBR/ArcGIS/rest/services/Albany_Couty_Election_Districts/FeatureServer/0
+
 library(readxl)
 library(sf)
 library(tidyverse)
