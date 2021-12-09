@@ -3,14 +3,14 @@ library(tigris)
 library(tidyverse)
 library(classInt)
 
-goats <- nass_data(
+hogs <- nass_data(
                     source_desc = 'CENSUS',
                      year = 2017,
                      short_desc = "HOGS - INVENTORY",
                      domain_desc = 'TOTAL'
                      )
 
-goats$Value <- as.numeric(gsub(",", "",goats$Value))
+hogs$Value <- as.numeric(gsub(",", "",hogs$Value))
 
 
 county <- counties(cb=TRUE, resolution = '20m') %>% filter(STATEFP != 72) %>% shift_geometry() 
@@ -18,7 +18,7 @@ states <- states(cb=TRUE, resolution = '20m')  %>% filter(STATEFP != 72) %>% shi
 
 us <- sf::st_union(states)
 
-joined <- left_join(county, goats, by=c("STATEFP"="state_fips_code", "COUNTYFP"="county_code"))
+joined <- left_join(county, hogs, by=c("STATEFP"="state_fips_code", "COUNTYFP"="county_code"))
 
 classes <- classIntervals(joined$Value/(joined$ALAND/2.59e+6), n = 9, style = "fisher", dataPercision=0)
   
