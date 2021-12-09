@@ -20,7 +20,7 @@ us <- sf::st_union(states)
 
 joined <- left_join(county, hogs, by=c("STATEFP"="state_fips_code", "COUNTYFP"="county_code"))
 
-classes <- classIntervals(joined$Value/(joined$ALAND/2.59e+6), n = 9, style = "fisher", dataPercision=0)
+classes <- classIntervals(joined$Value/(joined$ALAND/2.59e+6), n = 9, style = "fisher")
   
 joined <- joined %>% mutate(percent_class = cut(joined$Value/(joined$ALAND/2.59e+6), breaks=classes$brks, include.lowest = T, 
                                                 labels=scales::comma(classes$brks[2:length(classes$brks)]),0) )
