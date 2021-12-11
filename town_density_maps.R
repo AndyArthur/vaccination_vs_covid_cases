@@ -4,31 +4,25 @@ library(classInt)
 library(tidycensus)
 library(sf)
 
-pop2020 <- get_decennial(geography = "block", state='ny', county='albany', variables = "P1_001N", 
-                         year = 2020, cache=TRUE, geometry = FALSE)
-
-blocks <- blocks(state='ny', county='Albany') %>% st_transform('EPSG:3857')
+blocks <- get_decennial(geography = "block", state='ny', county='albany', variables = "P1_001N", 
+                         year = 2020, cache=TRUE, geometry = TRUE) %>% st_transform('EPSG:3857')
 
 countysub <- county_subdivisions(state='ny', county='Albany') %>% st_transform('EPSG:3857')
 
 acroads <- roads(state='ny',county='albany') %>% st_transform('EPSG:3857') 
 
-for (town in countysub$NAMELSAD20) {
-  countysubpart <- countysub %>% filter(NAMELSAD20 == town)
+for (town in countysub$NAMELSAD) {
+  countysubpart <- countysub %>% filter(NAMELSAD == town)
   blockpart <- st_intersection(countysubpart, blocks)
   roadpart <- st_intersection(countysubpart, acroads)
   
-  joined <- inner_join(pop2020, blockpart, by=c("GEOID"="GEOID20.1")) 
-  
-  classes <- classIntervals(joined$value/(joined$ALAND20.1/2.59e+6), n = 17, style = "fisher")
+  classes <- classIntervals(blockpart$value/(blockpart$ALAND10/2.59e+6), n = 17, style = "fisher")
     
-  joined <- joined %>% mutate(percent_class = cut(joined$value/(joined$ALAND20.1/2.59e+6), breaks=classes$brks, include.lowest = T, 
+  blockpart <- joined %>% mutate(percent_class = cut(blockpart$value/(blockpart$ALAND10/2.59e+6), breaks=classes$brks, include.lowest = T, 
                                                   labels=paste(scales::comma(classes$brks[1:length(classes$brks)-1],1), scales::comma(classes$brks[2:length(classes$brks)],  accuracy=1 ), sep=' - ' ) ) )
   
-  ggplot(joined, aes(fill=percent_class, geometry=geom)) + geom_sf(size=0.01) +
+  ggplot(blockpart, aes(fill=percent_class, geometry=geometry)) + geom_sf(size=0.01) +
     geom_sf(data=roadpart, mapping=aes(), size=0.3, fill=NA) +
-    #scale_size_discrete(range=c(0.2,0.6)) +
-    #ggfx::with_outer_glow(geom_sf(data=countysubpart, mapping=aes(), fill=NA, color='black', size=0.4)) +
     scale_fill_viridis_d(option='C', 
                          direction = 1,
                          name = 'Residents\nPer Square Mile',
@@ -53,5 +47,4 @@ for (town in countysub$NAMELSAD20) {
     )
   
   ggsave(paste('/home/andy/Desktop/county-svg/',town,'.svg',sep=''), width=1920, height=1080, units='px', dpi=150, device = grDevices::svg)
-  #ggsave(paste('/home/andy/Desktop/county-jpg/',town,'.jpg',sep=''), width=1920, height=1080, units='px', dpi=150)
 }
