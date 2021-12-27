@@ -19,7 +19,6 @@ ggplot(travel, aes()) + geom_sf(aes(fill=S0801_C01_046E), size=0.03) +
   scale_fill_viridis_c(name='Average Commute\nTime (minutes) ')+
   scale_x_continuous(expand=c(0,0)) +
   scale_y_continuous(expand=c(0,0)) +
-  coord_sf(xlim=c(bbox[1], bbox[3]), ylim=c(bbox[2], bbox[4])) +
   labs(
     title=title,
     tag='Andy Arthur, 12/27/2021',
