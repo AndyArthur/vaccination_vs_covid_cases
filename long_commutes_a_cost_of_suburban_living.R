@@ -5,17 +5,16 @@ library(tigris)
 
 #acs <- load_variables(2019, "acs5/subject", cache=T)
 
-bbox <-  county_subdivisions(state='ny') %>% filter(NAME %in% c('Albany','Clifton Park', 'Guilderland','North Greenbush','New Scotland','Bethlehem','Sand Lake')) %>% st_bbox()
+bbox <-  county_subdivisions(state='ny') %>% filter(NAME %in% c('Clifton Park', 'New Scotland','Sand Lake')) %>% st_bbox()
 county <- counties(state='ny', cb=TRUE) %>% st_crop(bbox)
 cosub <- county_subdivisions(state='ny')  %>% st_crop(bbox)
-label <- cosub %>% st_crop(bbox) 
 travel<-get_acs(geography='tract',variables='S0801_C01_046',state='ny',geometry = TRUE, output='wide', cache_table=T) %>% st_crop(bbox)
 
 title <- 'LONG COMMUTES: A cost of suburban living'
 
 ggplot(travel, aes()) + geom_sf(aes(fill=S0801_C01_046E), size=0.03) +
   geom_sf(data=cosub, size=0.2, color='white', fill=NA)+  
-  ggsflabel::geom_sf_text_repel(data=label, color='white',fontface='bold',point.size=NA, mapping=aes(label=NAME), size=3)+  
+  ggsflabel::geom_sf_text_repel(data=cosub, color='white',fontface='bold',point.size=NA, mapping=aes(label=NAME), size=3)+  
   geom_sf(data=county, size=0.5, color='white', fill=NA)+ 
   scale_fill_viridis_c(name='Average Commute\nTime (minutes) ')+
   scale_x_continuous(expand=c(0,0)) +
