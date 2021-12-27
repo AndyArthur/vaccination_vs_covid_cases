@@ -6,9 +6,9 @@ library(tigris)
 #acs <- load_variables(2019, "acs5/subject", cache=T)
 
 bbox <-  county_subdivisions(state='ny') %>% filter(NAME %in% c('Albany','Clifton Park', 'Guilderland','North Greenbush','New Scotland','Bethlehem','Sand Lake')) %>% st_bbox()
-label <- cosub %>% st_crop(bbox) 
 county <- counties(state='ny', cb=TRUE) %>% st_crop(bbox)
 cosub <- county_subdivisions(state='ny')  %>% st_crop(bbox)
+label <- cosub %>% st_crop(bbox) 
 travel<-get_acs(geography='tract',variables='S0801_C01_046',state='ny',geometry = TRUE, output='wide', cache_table=T) %>% st_crop(bbox)
 
 title <- 'LONG COMMUTES: A cost of suburban living'
