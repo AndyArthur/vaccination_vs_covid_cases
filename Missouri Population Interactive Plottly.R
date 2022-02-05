@@ -19,4 +19,4 @@ plot_ly(
   textfont=list(family='Overpass Mono')
 ) -> fig
 
-fig %>% plotly_json(FALSE) %>% str_replace_all("n",'') %>% write('/tmp/2020 Missouri  Population.jsx')
+fig %>% plotly_json(FALSE) %>% str_replace_all("\n",'') %>% write('/tmp/2020 Missouri Population.jsx')
