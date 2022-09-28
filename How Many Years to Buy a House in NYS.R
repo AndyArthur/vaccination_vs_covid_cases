@@ -1,5 +1,8 @@
 library(tidyverse)
 library(tigris)
+library(sf)
+library(terra)
+library(tidycensus)
 rm(list=ls())
 re <- read_csv('https://econdata.s3-us-west-2.amazonaws.com/Reports/Core/RDC_Inventory_Core_Metrics_County.csv', col_types = c('c','c'))
 
