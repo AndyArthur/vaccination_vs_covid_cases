@@ -31,7 +31,7 @@ cls <- wacolors::wa_pal('ferries',n=5)[4]
 nyco %>% 
   inner_join(tom, by=c('NAME'='county')) %>%
   inner_join(ce, by=c('NAME'='county')) %>%
-  mutate(pv = `ev`/TOTAL, pv = cut(pv, breaks=seq(0,1,0.01), labels=scales::percent(seq(0,0.99,0.01)))) %>%
+  mutate(pv = `ev`/TOTAL, pv = cut(pv, breaks=seq(0,1,0.01), labels=scales::percent(seq(0,0.99,0.01), accuracy=1))) %>%
   ggplot() +
   geom_sf(aes(fill=pv), color='white') +
   wacolors::scale_fill_wa_d(palette = "ferries", guide = "legend") +
