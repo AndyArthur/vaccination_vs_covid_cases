@@ -1,0 +1,70 @@
+```{r, setup}
+library(reticulate)
+library(tidyverse)
+rm(list=ls())
+```
+
+Obtain data using tableau-scraper in *python*
+
+```{python}
+
+from tableauscraper import TableauScraper as TS
+url = 'https://public.tableau.com/views/Vaccine_County_Public/NYSCountyVaccinations?:embed=y&:showVizHome=n&:tabs=n&:toolbar=n&:device=desktop&showShareOptions=false&:apiID=host0#navType=1&navSrc=Parse'
+ts = TS()
+ts.loads(url)
+wb = ts.getWorkbook()
+wb = wb.setParameter("% Vaccinations", "People Up to Date")
+
+vacdata = wb.worksheets[11].data
+
+```
+
+Create the map ...
+
+```{r}
+
+library(ggtext)
+vacdata <- py$vacdata
+vacdata$`Measure Values-alias` = parse_number(vacdata$`Measure Values-alias`)
+
+nyco <- tigris::counties('ny', cb=T)
+
+vacdata %>% 
+  filter(`Measure Names-alias`=='% Eligible People Up to Date') %>%
+  inner_join(nyco, ., by=c('NAME'='County-value')) %>% 
+  ggplot() + geom_sf(aes(fill=`Measure Values-alias`), color='white', linewidth=0.8) + 
+  ggsflabel::geom_sf_text_repel(aes(label=str_c(`Measure Values-alias`)), size=4, fontface='bold', bg.r=0.3, bg.color='white', point.size=NA) +
+  scale_fill_viridis_b(option = 'viridis', labels=scales::label_percent(scale=1)) +
+  theme_void() +
+  coord_sf(expand=F, crs=3857) +
+  labs(title = str_c('<span style="font-size: 45pt; color: ',viridis::viridis(n=8)[3],
+                     '">Population Fully Up-to-Date on COVID Vaccination</span><br ><em>As of December 23, 2022</em>'),
+       y = "",
+       x = "",
+       tag=paste('Andy Arthur,', format(Sys.Date(), format="%-m/%-d/%y"),'\nSource: NYS Department of Health. coronavirus.health.ny.gov/vaccination-progress-date'),
+       fill = "")  +
+  theme(
+    legend.key.height = unit(0.75,'cm'),
+    legend.key.width = unit(3,'cm'),
+    legend.position = c(0.27,0.17),
+    legend.spacing.y = unit(0.5, 'cm'),
+    legend.direction = 'horizontal',
+    text= element_text(family='Lato',size=14),
+    plot.title=element_textbox(halign = 0.5, hjust=0, face='bold',size=24, margin=unit(c(15,0,5,0),'pt'), maxheight=0, width=0.4),
+    plot.background = element_rect(fill = "white", color="white"),
+    plot.subtitle=element_textbox(hjust=0.5, halign=0.5, margin=unit(c(5,0,5,0),'pt')),
+    plot.tag=element_text(size=10,hjust=0, color='#555555'),
+    plot.margin = unit(c(1,1,1,1), 'lines'),
+    plot.tag.position = c(0.0,0.01),
+  ) 
+```
+
+save the map
+
+```{r}
+fn <- str_c('fully-vacc')
+ggsave(paste('~/Desktop/',fn,'.jpg',sep=''), width=1920, height=1200, units='px', dpi=120, device = grDevices::jpeg)
+ggsave(paste('~/Desktop/',fn,'.svg',sep=''), width=1920, height=1200, units='px', dpi=120, device = grDevices::svg)
+system(paste('scour ~/Desktop/',fn,'.svg ~/Desktop/',fn,'.svgz',sep=''))
+unlink(str_c('~/Desktop/',fn,'.svg'))
+```
