@@ -9,7 +9,6 @@ rm(list=ls())
 rf <- read_sf('https://data.ny.gov/api/geospatial/9a8c-vfzj?accessType=DOWNLOAD&method=export&format=GeoJSON')
 
 nyco <- counties('ny', cb=T) %>% st_transform(3857)
-nyt <- tracts('ny', cb=T) %>% st_transform(3857)
 
 rf %>% mutate(square_footage = parse_number(square_footage)) %>% 
   filter(entity_name == 'SONBYRNE SALES INC') -> sws 
