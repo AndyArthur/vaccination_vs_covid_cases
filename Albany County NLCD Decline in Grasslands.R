@@ -58,6 +58,6 @@ ggplot() + geom_sf(data=nlcd.poly, aes(fill=layer), linewidth=0) +
 
 fn <- str_c('acty-grass')
 ggsave(paste('/tmp/',fn,'.jpg',sep=''), width=1920, height=1700, units='px', dpi=150)
-ggsave(paste('/tmp/',fn,'.svg',sep=''), width=1920, height=1700, units='px', dpi=120, device = grDevices::svg)
+ggsave(paste('/tmp/',fn,'.svg',sep=''), width=1920, height=1700, units='px', dpi=150, device = grDevices::svg)
 system(paste('scour /tmp/',fn,'.svg /tmp/',fn,'.svgz',sep=''))
 
