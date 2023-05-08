@@ -27,7 +27,7 @@ ueRate %>% filter(MONTH != '00') %>%
   filter(DATE==max(DATE)) -> ueRateM
 
 counties <- counties(state='ny', cb=T)
-cousub <- county_subdivisions(state='ny', cb=T) %>% st_simplify(preserveTopology = T, dTolerance = 1000)
+cousub <- county_subdivisions(state='ny', cb=T) %>% rmapshaper::ms_simplify()
 countiesmerge <- st_sf(st_union(counties))
 
 
@@ -49,11 +49,11 @@ ggplot() +
   geom_sf(data = uv, aes(fill = UNEMPRATE), linewidth=0.01) +
   geom_sf(data = nys, fill=NA, linewidth=1) +
   geom_sf(data=counties, size=0.3, fill=NA)+
-  scale_fill_fermenter(palette = "RdYlGn", 
-                       direction = -1, breaks=seq(0,20,1),
+  scale_fill_fermenter(palette = "RdYlBu", 
+                       direction = -1, breaks=seq(0,20,0.5),
                        label=scales::label_percent(scale=1)
                        ) + 
-  geom_sf(data=cousub, linewidth=0.03, fill=NA, color='white') +
+  geom_sf(data=cousub, linewidth=0.03, fill=NA, color='black') +
   geom_sf(data=countiesmerge, fill=NA, size=0.6)+
   coord_sf(expand=F) +
   theme_void() +
@@ -66,7 +66,7 @@ ggplot() +
        fill = "") +
   theme(
     legend.key.height = unit(1.5,'cm'),
-    legend.key.width = unit(2.3,'cm'),
+    legend.key.width = unit(3,'cm'),
     legend.position = c(0.25,0.17),
     text= element_text(family='Lato',size=14),
     plot.title=element_textbox(halign = 0.5, hjust=0, face='bold',size=35, margin=unit(c(15,0,5,0),'pt'), maxheight=0, width=0.4),
@@ -78,14 +78,14 @@ ggplot() +
     legend.direction = 'horizontal'
   ) 
 
-fn <- str_c('unemployment-rate',ueRateM$DATE)
+fn <- str_c('unemployment-rate',ueRateM$DATE[1])
 ggsave(paste('/tmp/',fn,'.jpg',sep=''), width=1920, height=1200, units='px', dpi=120,  device = grDevices::jpeg)
 ggsave(paste('/tmp/',fn,'.svg',sep=''), width=1920, height=1200, units='px', dpi=120, device = grDevices::svg)
 system(paste('scour /tmp/',fn,'.svg /tmp/',fn,'.svgz',sep=''))
 
 
 ueRate %>% 
-  filter(MONTH == '00', YEAR>2009) %>%
+  filter(MONTH == '00', YEAR>2010) %>%
   inner_join(counties('ny',cb=T, resolution='20m'), ., by=c('NAMELSAD' = 'AREA')) %>%
   ggplot() + geom_sf(aes(fill=UNEMPRATE), linewidth=0.1) + 
   facet_wrap(~YEAR) +
@@ -95,7 +95,7 @@ ueRate %>%
   coord_sf(expand=F) +
   labs(title = str_c('<span style="font-size: 45pt">Unemployment Rate</span><br />',
                      'NYS Department of Labor, Local Area Unemployment Statistics,  ',
-                 'Andy Arthur,', format(Sys.Date(), format="%-m/%-d/%y.")),
+                 'Andy Arthur, ', format(Sys.Date(), format="%-m/%-d/%y.")),
        fill = "")  +
   theme(
     text= element_text(family='Roboto Condensed',size=18),

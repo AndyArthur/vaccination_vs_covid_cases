@@ -8,13 +8,13 @@ rm(list=ls())
 wx <- read_csv('~/Downloads/3059447.csv')
 
 wx %>% 
-  filter(month(DATE) == 2, year(DATE) > 2002) %>%
+  filter(month(DATE) == 5, year(DATE) > 2002) %>%
   transmute(HighTemp = floor(TMAX/5)*5, Days = sum(n())) %>%
   group_by(HighTemp) %>%
   summarise(Days = n()) %>%
   ggplot() + geom_col(aes(HighTemp, Days, fill=HighTemp)) +
   scale_y_continuous(breaks=seq(0,200,10)) +
-  scale_x_continuous(breaks=seq(0,80,5)) +
+  scale_x_continuous(breaks=seq(0,100,5)) +
   scale_fill_gradientn(name = "", colors = c("#DC143C", "pink", "violet", "purple", "blue", "cyan", "green", "yellow", "orange", "red", "darkred"), space = "Lab",
                        na.value = "grey50", guide = "colourbar", aesthetics = "fill", limits = c(-35,115), seq(-30,115,10)) +
   theme_minimal() +
@@ -34,7 +34,7 @@ wx %>%
 fig %>% plotly_json(FALSE) %>% str_replace_all("\n",'') %>% write('/tmp/covid-19-positivity.jsx')
 
 
-
+fig
 
 wx %>% 
   filter(month(DATE) == 2) %>%

@@ -68,3 +68,17 @@ dpi <- 130
 ggsave(str_c('/tmp/',fn,'.jpg'), units='px', width=width, height=height, dpi=dpi)
 ggsave(str_c('/tmp/',fn,'.svg'), units='px', width=width, height=height, dpi=dpi, device = grDevices::svg)
 system(paste('scour /tmp/',fn,'.svg /tmp/',fn,'.svgz',sep=''))
+
+# export block shapefil
+op %>% 
+  st_drop_geometry() %>%
+  left_join(
+    get_decennial(geography = "block", variables = "P1_001N", 
+                  year = 2020, cache=T, geometry = T, state='ny'),
+    .,
+    join_by(GEOID)
+    ) -> opbk
+
+opbk %>%
+  mutate(Pop = value.x, PP = Prisoners/value.x*1000) %>%
+  write_sf('/tmp/prison.gpkg')
