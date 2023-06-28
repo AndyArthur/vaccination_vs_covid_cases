@@ -1,11 +1,13 @@
-library(sf)
 library(tidyverse)
+library(sf)
 library(terra)
+library(tigris)
+
 rm(list=ls())
 
 wms_url <- 'WMS:https://dmsdata.cr.usgs.gov/geoserver/wms?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&LAYERS=lcmap_primary-landcover_conus_year_data%3Aprimary-landcover_conus_year_data&FORMAT=image/tiff&SRS=EPSG:3857&BBOX=-1.439108301367112E7,2488126.723717102,-7026304.485240375,6968528.631338398'
 
-bbx<- tigris::county_subdivisions('ny') %>% 
+bbx<- county_subdivisions('ny') %>% 
   filter(NAME == 'Albany') %>% 
   st_transform(3857) %>% 
   st_bbox()
