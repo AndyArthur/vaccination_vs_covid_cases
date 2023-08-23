@@ -67,8 +67,6 @@ ggsave(paste('/tmp/',fn,'.jpg',sep=''), width=1920, height=1500, units='px', dpi
 ggsave(paste('/tmp/',fn,'.svg',sep=''), width=1920, height=1500, units='px', dpi=150, device = grDevices::svg)
 system(paste('scour /tmp/',fn,'.svg /tmp/',fn,'.svgz',sep=''))
 
-source('upload-svg.R', local=T)
-
 library(gt)
 firetower %>%
   transmute(
@@ -90,10 +88,5 @@ output_table  %>% tab_header(
 
 output_header
 
-output_header %>% gtsave('/tmp/output.png', expand=c(0,20,5,10)) 
-
-wp.post.content <- output_table %>%  as_raw_html(inline_css = F) 
-
-wp.post.title <- 'Firetowers Participating in Light Up the Night 2023'
-source('upload-wordpress.R', local=T)
+output_header %>% gtsave('/tmp/firetower-table.png', expand=c(0,20,5,10)) 
 
